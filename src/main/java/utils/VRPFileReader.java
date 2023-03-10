@@ -16,10 +16,9 @@ public class VRPFileReader { // Lese fra interface #n filer
     List<Patient> patientList = new ArrayList<>();
 
     public List<Patient> fetchPatients() throws IOException, ParseException {
-        
+
         JSONObject obj = (JSONObject) parser.parse(new FileReader("src/main/java/resources/train_" + Settings.TASK_NUMBER + ".json"));
         JSONObject patientsJson = (JSONObject) obj.get("patients");
-        //patientList.add(null);
         for (int i = 1; i < 101; i++) {
             JSONObject JSONpatient = (JSONObject) patientsJson.get("" + i);
             Long x_coord = (Long) JSONpatient.get("x_coord");
@@ -35,5 +34,21 @@ public class VRPFileReader { // Lese fra interface #n filer
         }
         return patientList;
     }
+
+    public void fetchData(JSONObject obj) {
+        long nurse_capacity = (long) obj.get("capacity_nurse");
+        long number_of_nurses = (long) obj.get("nbr_nurses");
+        JSONObject depotJson = (JSONObject) obj.get("depot");
+        long depot_return_time = (long) depotJson.get("return_time");
+        Settings.setNurse_capacity((int) nurse_capacity);
+        Settings.setNumber_of_nurses((int) number_of_nurses);
+        Settings.setDepot_return_time((int) depot_return_time);
+    }
+
+    public void fetchTravelMatrix(JSONObject obj) {
+        List<List<Double>> travelMatrix = (List<List<Double>>) obj.get("travel_times");
+        Settings.setTravelMatrix(travelMatrix);
+    }
+
 
 }
