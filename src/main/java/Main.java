@@ -1,14 +1,18 @@
+import models.Nurse;
 import models.Patient;
 import models.Settings;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import service.PopulationGenerator;
 import utils.VRPFileReader;
 
+import javax.swing.*;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Main {
 
@@ -22,9 +26,29 @@ public class Main {
         reader.fetchData(obj);
         reader.fetchTravelMatrix(obj);
 
-        for(int p = 0; p < patientList.size(); p++) {
-            System.out.println(patientList.get(p).getId());
+        PopulationGenerator pg = new PopulationGenerator();
+        Nurse nurse = new Nurse(1, Settings.nurse_capacity, patientList);
+        System.out.println(nurse.getCapacity());
+        System.out.println("PENIS");
+        nurse.setCapacity(10);
+        System.out.println(nurse.getCapacity());
+        System.out.println("bajs");
+        nurse.setCapacity(10);
+        System.out.println(nurse.getCapacity());
+        System.out.println("TESS");
+        //List<Nurse> list = pg.generateRandom(patientList, Settings.number_of_nurses);
+
+        int counter = 0;
+        /*
+        for (Nurse nurse : list) {
+             System.out.println("New nurse");
+             for(Patient p : nurse.getListOfPatients()){
+                 System.out.println(p.getId());
+                 counter++;
+             }
         }
-        System.out.println(Settings.travelMatrix);
+         */
+        System.out.println("siste");
+        System.out.println(counter);
     }
 }
