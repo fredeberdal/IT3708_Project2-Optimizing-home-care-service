@@ -8,7 +8,7 @@ public class Settings {
     public static int nurse_capacity;
     public static int number_of_nurses;
     public static int depot_return_time;
-    public static double total_travel_time = 0;
+    public static double max_travel_time = 0;
 
     public static List<List<Double>> travelMatrix;
 
@@ -29,7 +29,7 @@ public class Settings {
     }
 
     public static void setTotal_travel_time(double travel_time) {
-        Settings.total_travel_time = total_travel_time + travel_time;
+        Settings.max_travel_time = max_travel_time + travel_time;
     }
 
 }

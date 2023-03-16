@@ -9,8 +9,7 @@ import utils.VRPFileReader;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Main {
 
@@ -24,7 +23,6 @@ public class Main {
         reader.fetchData(obj);
         reader.fetchTravelMatrix(obj);
         PopulationGenerator pg = new PopulationGenerator();
-
 
         List<Nurse> list = pg.generateRandom(patientList, Settings.number_of_nurses);
         double time = 0;
@@ -49,6 +47,7 @@ public class Main {
 
         System.out.println("siste");
         System.out.println(counter);
+
 
     }
 }
