@@ -18,21 +18,34 @@ public class PopulationGenerator {
         return listOfLists;
     }
 
-    public boolean checkValidity(Nurse nurse, Patient patient) {
+    public boolean checkValidity(Nurse nurse, Patient patient, int counter) {
         List<Patient> Patients = nurse.getListOfPatients();
         if (nurse.getListOfPatients().size() == 1) {
             System.out.println("Tom liste");
             return true;
         }
-        if (nurse.getNurse_traveled() < patient.getEndWindow()-patient.getCareTime() && nurse.getNurse_traveled() > patient.getStartWindow()) {
-            System.out.println("Time Window + care time");
-            System.out.println(nurse.getCapacity()-patient.getDemand() + "   sajlhskldaf");
+        if (nurse.getCapacity() > patient.getDemand() && nurse.getNurse_traveled() < patient.getStartWindow() && counter > 30) {
+            nurse.setNurse_traveled(patient.getStartWindow()-nurse.getNurse_traveled());
+        }
+        if (nurse.getNurse_traveled() < patient.getEndWindow()-patient.getCareTime() && nurse.getNurse_traveled() >= patient.getStartWindow()) {
+            //System.out.println("Time Window + care time");
             if (nurse.getCapacity()-patient.getDemand() > 0) {
-                System.out.println("demand");
+                //System.out.println("demand");
                 if(nurse.getNurse_traveled() + computeTravelDistance(nurse) + patient.getCareTime() < Settings.depot_return_time) {
-                    System.out.println("Is Valid");
-                    // TODO Pass på at pasientene til samme nurse ikke overlapper (caretime går over neste patient endWindow
-                    return true;
+                    //System.out.println("Is Valid");
+                    /*
+                    System.out.println(nurse.getId() + ": nurse traveled: " + nurse.getNurse_traveled());
+                    System.out.println("patient caretime: " + patient.getCareTime());
+                    System.out.println("travel distance : " + computeTravelDistance(nurse));
+                    System.out.println("patient endwindow: " + patient.getEndWindow());
+                    */
+                    System.out.println("før jeg er innerst:" + (nurse.getNurse_traveled() + computeTravelDistance(nurse) + patient.getCareTime() > patient.getEndWindow()));
+
+                    if((nurse.getNurse_traveled() + computeTravelDistance(nurse) + patient.getCareTime()) < patient.getEndWindow()){
+                        System.out.println("Jeg er innerst nå");
+                        return true;
+                        // TODO Pass på at pasientene til samme nurse ikke overlapper (caretime går over neste patient endWindow
+                    }
                 }
             }
         }
@@ -43,6 +56,7 @@ public class PopulationGenerator {
         //List<List<Integer>> listOfVisits = listInitializer(amountOfNurses);
         List<Patient> copyOfPatients = new ArrayList<>(patients);
         Depot depot = new Depot();
+        int d = 0;
         List<Nurse> listOfNurses = depot.getAvailable_nurses();
         while(copyOfPatients.size() != 0){
 
@@ -52,7 +66,7 @@ public class PopulationGenerator {
             Nurse nurse = listOfNurses.get(randomNurseIndex);
             int counter = 0;
             nurse.addListOfPatients(patient);
-            boolean isValid = checkValidity(nurse, patient);
+            boolean isValid = checkValidity(nurse, patient, counter);
 
             while (!isValid && counter < 100) {
                 //System.out.println("counter: " + counter);
@@ -60,14 +74,15 @@ public class PopulationGenerator {
                 randomNurseIndex = ThreadLocalRandom.current().nextInt(0, amountOfNurses);
                 nurse = listOfNurses.get(randomNurseIndex);
                 nurse.addListOfPatients(patient);
-                isValid = checkValidity(nurse, patient);
+                isValid = checkValidity(nurse, patient, counter);
                 counter++;
                 if (counter == 100 && !isValid) {
                     nurse.removeListOfPatients(patient);
                 }
             }
             if (isValid) {
-                nurse.setNurse_traveled(computeTravelDistance(nurse));
+                System.out.println(d++);
+                nurse.setNurse_traveled(computeTravelDistance(nurse) + patient.getCareTime());
                 nurse.setCapacity(patient.getDemand());
                 copyOfPatients.remove(patient);
 

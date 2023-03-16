@@ -25,21 +25,13 @@ public class Main {
         patientList = reader.fetchPatients();
         reader.fetchData(obj);
         reader.fetchTravelMatrix(obj);
-
         PopulationGenerator pg = new PopulationGenerator();
-        Nurse nurse = new Nurse(1, Settings.nurse_capacity, patientList);
-        System.out.println(nurse.getCapacity());
-        System.out.println("PENIS");
-        nurse.setCapacity(10);
-        System.out.println(nurse.getCapacity());
-        System.out.println("bajs");
-        nurse.setCapacity(10);
-        System.out.println(nurse.getCapacity());
-        System.out.println("TESS");
-        //List<Nurse> list = pg.generateRandom(patientList, Settings.number_of_nurses);
+        //Nurse nurse = new Nurse(1, Settings.nurse_capacity, patientList);
+
+        List<Nurse> list = pg.generateRandom(patientList, Settings.number_of_nurses);
 
         int counter = 0;
-        /*
+
         for (Nurse nurse : list) {
              System.out.println("New nurse");
              for(Patient p : nurse.getListOfPatients()){
@@ -47,7 +39,7 @@ public class Main {
                  counter++;
              }
         }
-         */
+
         System.out.println("siste");
         System.out.println(counter);
     }
