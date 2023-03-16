@@ -4,6 +4,7 @@ import models.Settings;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import service.Fitness;
 import service.PopulationGenerator;
 import utils.VRPFileReader;
 
@@ -23,10 +24,10 @@ public class Main {
         patientList = reader.fetchPatients();
         reader.fetchData(obj);
         reader.fetchTravelMatrix(obj);
-        PopulationGenerator pg = new PopulationGenerator();
-        //Nurse nurse = new Nurse(1, Settings.nurse_capacity, patientList);
+        Fitness fitness = new Fitness();
 
-
+        HashMap<List<Nurse>, Double> fit_pop= fitness.fitnessAndPopulation(patientList);
+        fit_pop.forEach((k, v) -> System.out.println("Fitness : " + v));
 
     }
 }
