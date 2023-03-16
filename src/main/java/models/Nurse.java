@@ -9,6 +9,8 @@ public class Nurse {
 
     private double nurse_traveled = 0.0;
 
+    private double time_traveled;
+
     private List<Patient> listOfPatients;
 
     public Nurse (int id, int capacity, List<Patient> listOfPatients) {
@@ -24,6 +26,12 @@ public class Nurse {
     }
     public void setCapacity(int demand) {
         this.capacity -= demand;
+    }
+
+    public double getTime_traveled() { return time_traveled; }
+
+    public void setTime_traveled(double time_traveled) {
+        this.time_traveled = time_traveled;
     }
 
     public double getNurse_traveled() {
