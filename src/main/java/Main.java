@@ -28,6 +28,7 @@ public class Main {
         PopulationGenerator pg = new PopulationGenerator();
         //Nurse nurse = new Nurse(1, Settings.nurse_capacity, patientList);
 
+
         List<Nurse> list = pg.generateRandom(patientList, Settings.number_of_nurses);
 
         int counter = 0;
@@ -39,6 +40,8 @@ public class Main {
                  counter++;
              }
         }
+
+
 
         System.out.println("siste");
         System.out.println(counter);

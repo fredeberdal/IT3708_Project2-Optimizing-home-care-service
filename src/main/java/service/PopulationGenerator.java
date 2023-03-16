@@ -17,16 +17,16 @@ public class PopulationGenerator {
         }
         return listOfLists;
     }
-    public boolean checkValidity(Nurse nurse, Patient patient) {
+    public boolean checkValidity(Nurse nurse, Patient patient, int counter) {
         List<Patient> Patients = nurse.getListOfPatients();
         if (nurse.getListOfPatients().size() == 1) {
             System.out.println("Tom liste");
             return true;
         }
-        if (nurse.getCapacity() > patient.getDemand() && nurse.getNurse_traveled() < patient.getStartWindow()) {
+        if (counter > 50 && nurse.getCapacity() > patient.getDemand() && nurse.getNurse_traveled() < patient.getStartWindow()) {
             nurse.setNurse_traveled(patient.getStartWindow()-nurse.getNurse_traveled());
         }
-        if (nurse.getNurse_traveled() < patient.getEndWindow()-patient.getCareTime() && nurse.getNurse_traveled() >= patient.getStartWindow()) {
+        if (nurse.getNurse_traveled() <= patient.getEndWindow()-patient.getCareTime() && nurse.getNurse_traveled() >= patient.getStartWindow()) {
             System.out.println("Time Window + care time");
             if (nurse.getCapacity()-patient.getDemand() > 0) {
                 System.out.println("demand");
@@ -41,7 +41,6 @@ public class PopulationGenerator {
         return false;
     }
     public List<Nurse> generateRandom(List<Patient> patients, int amountOfNurses){
-        //List<List<Integer>> listOfVisits = listInitializer(amountOfNurses);
         List<Patient> copyOfPatients = new ArrayList<>(patients);
         Depot depot = new Depot();
         int d = 0;
@@ -53,17 +52,16 @@ public class PopulationGenerator {
             Nurse nurse = listOfNurses.get(randomNurseIndex);
             int counter = 0;
             nurse.addListOfPatients(patient);
-            boolean isValid = checkValidity(nurse, patient);
+            boolean isValid = checkValidity(nurse, patient, counter);
 
-            while (!isValid) {
-                //System.out.println("counter: " + counter);
+            while (!isValid && counter < 100) {
                 nurse.removeListOfPatients(patient);
                 randomNurseIndex = ThreadLocalRandom.current().nextInt(0, amountOfNurses);
                 nurse = listOfNurses.get(randomNurseIndex);
                 nurse.addListOfPatients(patient);
-                isValid = checkValidity(nurse, patient);
+                isValid = checkValidity(nurse, patient, counter);
                 counter++;
-                if (counter == 100&& !isValid) {
+                if (counter == 100 && !isValid) {
                     nurse.removeListOfPatients(patient);
                 }
             }
