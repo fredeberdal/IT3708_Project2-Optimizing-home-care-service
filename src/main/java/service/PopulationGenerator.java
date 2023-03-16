@@ -20,19 +20,14 @@ public class PopulationGenerator {
     public boolean checkValidity(Nurse nurse, Patient patient, int counter) {
         List<Patient> Patients = nurse.getListOfPatients();
         if (nurse.getListOfPatients().size() == 1) {
-            System.out.println("Tom liste");
             return true;
         }
         if (counter > 50 && nurse.getCapacity() > patient.getDemand() && nurse.getNurse_traveled() < patient.getStartWindow()) {
             nurse.setNurse_traveled(patient.getStartWindow()-nurse.getNurse_traveled());
         }
         if (nurse.getNurse_traveled() <= patient.getEndWindow()-patient.getCareTime() && nurse.getNurse_traveled() >= patient.getStartWindow()) {
-            System.out.println("Time Window + care time");
             if (nurse.getCapacity()-patient.getDemand() > 0) {
-                System.out.println("demand");
-                if(nurse.getNurse_traveled() + computeTravelDistance(nurse) + patient.getCareTime() < Settings.depot_return_time) {
-                    System.out.println("Is Valid");
-                    System.out.println("før jeg er innerst:" + (nurse.getNurse_traveled() + computeTravelDistance(nurse) + patient.getCareTime() > patient.getEndWindow()));
+                  if(nurse.getNurse_traveled() + computeTravelDistance(nurse) + patient.getCareTime() < Settings.depot_return_time) {
                     return true;
 
                 }
@@ -61,30 +56,70 @@ public class PopulationGenerator {
                 nurse.addListOfPatients(patient);
                 isValid = checkValidity(nurse, patient, counter);
                 counter++;
-                if (counter == 100 && !isValid) {
+                if (counter == 99 && !isValid) {
                     nurse.removeListOfPatients(patient);
                 }
             }
             if (isValid) {
-                System.out.println(d++);
                 nurse.setNurse_traveled(computeTravelDistance(nurse) + patient.getCareTime());
                 nurse.setCapacity(patient.getDemand());
                 copyOfPatients.remove(patient);
 
-                //Settings.setTotal_travel_time(patient.getCareTime() + computeTravelDistance(nurse));
             }
         }
         return listOfNurses;
     }
+/*
+    public void generateRandomIndividual(int nurses, List<Patient> patients) {
+        List<List<Integer>> visitList = this.initEmptyNurseRoutes(nurses);
+        List<Patient> patientsCopy = new ArrayList<>(patients);
+
+        while(!patientsCopy.isEmpty()){
+            int ind = ThreadLocalRandom.current().nextInt(0, patientsCopy.size());
+            Patient patient = patientsCopy.remove(ind);
+            if(patient != null) {
+                int patientId = patient.getPatient_id();
+                int randomNurseId = ThreadLocalRandom.current().nextInt(0, nurses);
+
+                visitList.get(randomNurseId).add(patientId);
+                this.patientNurseMap.put(patientId, randomNurseId);
+                boolean valid = checkValidityOfIndividual(visitList);
+                int counter = 0;
+                // Make it so that if there is no valid combination, due to earlier
+                // problems we don't get stuck in this loop
+                while(!valid && (counter < 100)){
+                    visitList.get(randomNurseId).remove((visitList.get(randomNurseId).size() - 1));
+                    randomNurseId = ThreadLocalRandom.current().nextInt(0, nurses);
+                    visitList.get(randomNurseId).add(patient.getPatient_id());
+                    valid = checkValidityOfIndividual(visitList);
+                    counter++;
+                }
+            }
+        }
+        this.is_valid = checkValidityOfIndividual(visitList);
+
+        this.nurseRoutes = visitList;
+    }
+
+ */
 
 
     public Patient getLowestPatient(List<Patient>patients){
         Patient holder = patients.get(0);
         for(int i = 1; i < patients.size(); i++){
-            if(holder.getStartWindow() == 0) {
+            if(holder.getEndWindow() == 0) {
                 return holder;
             }
-            if(holder.getStartWindow() > patients.get(i).getStartWindow()){
+            if(holder.getEndWindow() > patients.get(i).getEndWindow()){
+                holder = patients.get(i);
+            }
+        }
+        return holder;
+    }
+    public Patient getLowestInterval(List<Patient> patients){
+        Patient holder = patients.get(0);
+        for(int i = 1; i < patients.size(); i++) {
+            if (holder.getEndWindow() - holder.getStartWindow() > patients.get(i).getEndWindow() - patients.get(i).getStartWindow()) {
                 holder = patients.get(i);
             }
         }

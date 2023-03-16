@@ -10,9 +10,7 @@ import utils.VRPFileReader;
 import javax.swing.*;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
 
@@ -29,21 +27,6 @@ public class Main {
         //Nurse nurse = new Nurse(1, Settings.nurse_capacity, patientList);
 
 
-        List<Nurse> list = pg.generateRandom(patientList, Settings.number_of_nurses);
 
-        int counter = 0;
-
-        for (Nurse nurse : list) {
-             System.out.println("New nurse");
-             for(Patient p : nurse.getListOfPatients()){
-                 System.out.println(p.getId());
-                 counter++;
-             }
-        }
-
-
-
-        System.out.println("siste");
-        System.out.println(counter);
     }
 }
