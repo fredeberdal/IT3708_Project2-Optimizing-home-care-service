@@ -5,6 +5,7 @@ import java.util.List;
 public class Settings {
 
     public static int TASK_NUMBER = 0;
+    public static int POP_SIZE = 100;
     public static int nurse_capacity;
     public static int number_of_nurses;
     public static int depot_return_time;
