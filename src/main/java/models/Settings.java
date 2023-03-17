@@ -28,7 +28,8 @@ public class Settings {
         Settings.depot_return_time = depot_return_time;
     }
 
-    public static void setMax_travel_time(double travel_time) {
+
+    public static void setTotal_travel_time(double travel_time) {
         Settings.max_travel_time = max_travel_time + travel_time;
     }
 

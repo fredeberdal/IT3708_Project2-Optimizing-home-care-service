@@ -7,12 +7,9 @@ import org.json.simple.parser.ParseException;
 import service.PopulationGenerator;
 import utils.VRPFileReader;
 
-import javax.swing.*;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
 
@@ -36,7 +33,7 @@ public class Main {
                 time = nurse.getTime_traveled();
             }
         }
-        Settings.setMax_travel_time(time);
+        Settings.setTotal_travel_time(time);
 
 
         int counter = 0;
