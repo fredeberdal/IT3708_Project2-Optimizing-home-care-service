@@ -6,9 +6,9 @@ public class Nurse {
 
     private final int id;
     private int capacity;
-
+    //Check if over depot return time
     private double nurse_traveled = 0.0;
-
+    //Fitness score
     private double time_traveled;
 
     private List<Patient> listOfPatients;

@@ -24,10 +24,24 @@ public class Main {
         reader.fetchData(obj);
         reader.fetchTravelMatrix(obj);
         Fitness fitness = new Fitness();
+        PopulationGenerator pop = new PopulationGenerator();
 
 
-        HashMap<List<Nurse>, Double> fit_pop= fitness.fitnessAndPopulation(patientList);
-        fit_pop.forEach((k, v) -> System.out.println("Fitness : " + v));
-
+        //HashMap<List<Nurse>, Double> fit_pop= (patientList);
+        pop.generatePopulation(patientList);
+        Settings.individuals.forEach((k, v) -> System.out.println("Fitness : " + v));
+        //Settings.individuals.forEach((k,v) -> k.get(0).getListOfPatients());
+        Optional<List<Nurse>> nurses = Settings.individuals.keySet().stream().findFirst();
+        List<Nurse> nurse = nurses.get();
+        String s = "[";
+        for(Nurse n : nurse){
+            s += "[";
+            for(Patient patients : n.getListOfPatients()){
+                s += "" + patients.getId() +", ";
+            }
+            s += "], ";
+        }
+        s+= "]";
+        System.out.println(s);
     }
 }

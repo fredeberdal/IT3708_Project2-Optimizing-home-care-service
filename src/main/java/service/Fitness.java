@@ -16,7 +16,7 @@ public class Fitness {
         PopulationGenerator pg = new PopulationGenerator();
         for(int i = 0; i< Settings.POP_SIZE; i++){
             List<Nurse> list = pg.generateRandom(patientList, Settings.number_of_nurses);
-            tup.put(list, max_fitness(list));
+            tup.put(list, calculateFitness(list));
             list = null;
         }
         return tup;
@@ -29,5 +29,19 @@ public class Fitness {
             }
         }
         return max;
+    }
+    public double calculateFitness(List<Nurse> nurses){
+        double fitness = 0;
+        int penalty = 1000;
+        double timeViolation = 0.0;
+        double totalTravelTime = 0.0;
+        for(Nurse nurse : nurses){
+            totalTravelTime += nurse.getTime_traveled();
+            if(nurse.getNurse_traveled() > Settings.depot_return_time){
+                timeViolation += nurse.getNurse_traveled() - Settings.depot_return_time;
+            }
+        }
+        fitness = totalTravelTime + (timeViolation * penalty);
+        return fitness;
     }
 }
