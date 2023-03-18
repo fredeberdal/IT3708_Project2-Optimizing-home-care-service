@@ -8,22 +8,61 @@ import models.Settings;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class PopulationGenerator {
+public class Individual {
     //public HashMap<List<Nurse>, Double> tup = new HashMap<List<Nurse>, Double>();
+    public boolean failed = false;
+    public List<Nurse> nurses;
+    public double fitness;
 
+    public Individual() {
+        this.nurses = generateGreedyInd(Settings.patients, Settings.number_of_nurses);
+        this.fitness = calculateFitness(nurses);
+    }
+    public double calculateFitness(List<Nurse> nurses){
+        double fitness = 0;
+        int penalty = 1000;
+        double timeViolation = 0.0;
+        double totalTravelTime = 0.0;
+        for(Nurse nurse : nurses){
+            System.out.println(nurse.getListOfPatients().size());
+            totalTravelTime += calculateRoute(nurse);
+            if(nurse.getNurse_traveled() > Settings.depot_return_time){
+                timeViolation += nurse.getNurse_traveled() - Settings.depot_return_time;
+            }
+        }
+        if(this.failed){
+            System.out.println("Suck dick penis");
+        }
+        fitness = totalTravelTime + (timeViolation * penalty);
+        return fitness;
+    }
+    public double calculateRoute(Nurse nurse){
+        double totalTravelTime = 0;
+        int p=0;
+        //System.out.println(nurse.getListOfPatients().size());
+        for(int i = 0; i<nurse.getListOfPatients().size(); i++){
+            if(i == nurse.getListOfPatients().size()-1){
+                totalTravelTime += Settings.travelMatrix.get(0).get(nurse.getListOfPatients().get(i).getId());
 
+            }
+        }
+        return totalTravelTime;
+    }
+    /*
     public void generatePopulation(List<Patient> patientList) {
-        PopulationGenerator pg = new PopulationGenerator();
+        Individual pg = new Individual(patientList, Settings.number_of_nurses);
         HashMap<List<Nurse>, Double> tup = new HashMap<List<Nurse>, Double>();
         Fitness fitness = new Fitness();
         for (int i = 0; i < Settings.POP_SIZE; i++) {
-            List<Nurse> list = pg.generateRandom(patientList, Settings.number_of_nurses);
+            List<Nurse> list = pg.generateGreedyInd(patientList, Settings.number_of_nurses);
             tup.put(list, fitness.calculateFitness(list));
             list = null;
         }
         sortIndividuals(tup);
 
     }
+
+     */
 
     public void sortIndividuals(HashMap<List<Nurse>, Double> individuals) {
         ArrayList<Double> list = new ArrayList<>();
@@ -114,24 +153,62 @@ public class PopulationGenerator {
             int randomPatientIndex = ThreadLocalRandom.current().nextInt(0, copyOfPatients.size()); //eller bruke getLowestPatient()?
             Patient patient = copyOfPatients.remove(randomPatientIndex);
             Nurse n = null;
+            if (patients.size() - 1 == copyOfPatients.size()) {
+                n = nurses.get(0);
+                nursePos.put(n, patient.getId());
+                n.addListOfPatients(patient);
+            } else {
+                List<Nurse> nursesChecked = new ArrayList<>();
+                n = findClosestNurse(patient, nurses, nursePos, nursesChecked, true);
+                n.addListOfPatients(patient);
+                nursesChecked.add(n);
+                boolean valid = checkValidity(nurses);
+                while (amountOfNurses > nursesChecked.size() && !valid) {
+                    n.removeListOfPatients(patient);
+                    n = null;
+                    n = findClosestNurse(patient, nurses, nursePos, nursesChecked, false);
+                    n.addListOfPatients(patient);
+                    nursesChecked.add(n);
+                    valid = checkValidity(nurses);
+                }
+                if (!valid) {
+                    System.out.println("Her feilet jeg ");
+                    n.removeListOfPatients(patient);
+                    n = null;
+                    n = findClosestNurse(patient, nurses, nursePos, nursesChecked, false);
+                    this.failed = true;
+                }
+                n.addListOfPatients(patient);
+                nursePos.put(n, patient.getId());
+            }
+        }
+        return nurses;
+    }
 
-            List<Nurse> nursesChecked = new ArrayList<>();
-            double distance = 10000;
-            int closestNurse = 0;
-            for (Nurse nurse : nursePos.keySet()) {
-                int pos = nursePos.get(nurse);
-                double travelTime = Settings.travelMatrix.get(pos).get(patient.getId());
+    public Nurse findClosestNurse(Patient patient, List<Nurse>nurses, Map<Nurse, Integer> nursePos, List<Nurse>checkedNurses, boolean checked) {
+        double distance = 10000;
+        int closestNurse = 0;
+        Nurse n = null;
+        for (Nurse nurse : nursePos.keySet()) {
+            int pos = nursePos.get(nurse);
+            double travelTime = Settings.travelMatrix.get(pos).get(patient.getId());
+            if (checked) {
                 if (travelTime < distance) {
                     distance = travelTime;
                     closestNurse = nurse.getId();
                     n = nurses.get(closestNurse);
                 }
+            } else {
+
+                if (travelTime < distance && !(checkedNurses.contains(nurse))) {
+                    distance = travelTime;
+                    closestNurse = nurse.getId();
+                    n = nurses.get(closestNurse);
+                }
             }
-            n.addListOfPatients(patient);
-            nursesChecked.add(n);
-            boolean valid = checkValidity(nurses);
+
         }
-        return null;
+        return n;
     }
 
     public boolean checkValidity(List<Nurse>nurses) {
@@ -139,10 +216,12 @@ public class PopulationGenerator {
             int lastStop = 0;
             int capacityUsed = 0;
             double totalTime = 0;
+            double totalTravelTime = 0;
 
             if(n.getListOfPatients().size() != 0){
                 for(Patient p : n.getListOfPatients()){
                     totalTime += Settings.travelMatrix.get(lastStop).get(p.getId());
+                    totalTravelTime += Settings.travelMatrix.get(lastStop).get(p.getId());
                     if(totalTime < p.getStartWindow()){
                         totalTime = p.getStartWindow();
                     }
@@ -158,11 +237,14 @@ public class PopulationGenerator {
                 }
                 //Back to depot
                 totalTime+= Settings.travelMatrix.get(0).get(lastStop);
-                if(Settings.depot_return_time > totalTime){
+                totalTravelTime += Settings.travelMatrix.get(0).get(lastStop);
+                if(Settings.depot_return_time < totalTime){
                     return false;
                 }
             }
-
+            n.setNurse_traveled(totalTime);
+            //n.setCapacity(capacityUsed);
+            n.setTime_traveled(totalTravelTime);
         }
         return true;
     }
