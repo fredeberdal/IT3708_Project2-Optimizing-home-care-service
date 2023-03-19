@@ -6,10 +6,11 @@ public class Nurse {
 
     private final int id;
     private int capacity;
-
+    //Check if over depot return time
     private double nurse_traveled = 0.0;
 
     private double time_traveled = 0.0;
+
 
     private List<Patient> listOfPatients;
 
@@ -23,7 +24,7 @@ public class Nurse {
 
     public int getCapacity() { return capacity; }
     public void setCapacity(int demand) {
-        this.capacity -= demand;
+        this.capacity = demand;
     }
 
     public double getTime_traveled() { return time_traveled; }
@@ -36,7 +37,7 @@ public class Nurse {
         return nurse_traveled;
     }
     public void setNurse_traveled(double nurse_traveled) {
-        this.nurse_traveled += nurse_traveled;
+        this.nurse_traveled = nurse_traveled;
     }
 
     public List<Patient> getListOfPatients() {

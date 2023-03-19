@@ -25,6 +25,8 @@ public class PopulationGenerator {
                 if(nurse.getNurse_traveled() + computeTravelDistance(nurse) + patient.getCareTime() < Settings.depot_return_time) {
                     System.out.println("Is Valid");
                     return true;
+                    //if(nurse.getNurse_traveled() + computeTravelDistance(nurse) + patient.getCareTime() < Settings.depot_return_time) {
+                    // Fjerna for å heller legge på penalty på fitness om man er over depot return time slik at den skal lære
                     // TODO Pass på at pasientene til samme nurse ikke overlapper (caretime går over neste patient endWindow
                 }
             }
