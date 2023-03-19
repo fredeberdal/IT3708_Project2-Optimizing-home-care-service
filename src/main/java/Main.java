@@ -26,14 +26,16 @@ public class Main {
         Settings.setPatients(patientList);
         reader.fetchData(obj);
         reader.fetchTravelMatrix(obj);
-
-        Fitness fitness = new Fitness();
         Depot depot = new Depot();
         Population pop = new Population();
+        pop = pop.makePopulation();
+        pop.sortPop();
+        pop.print();
         double best = 10000;
+
+        /*
         for(int i = 0; i<10000; i++){
-            pop = pop.makePopulation();
-            pop.sortPop();
+            pop = pop.generateNewGen(pop);
             if(pop.individuals.get(0).fitness < best){
                 best = pop.individuals.get(0).fitness;
                 System.out.println("Bedre: " + best);
@@ -41,6 +43,8 @@ public class Main {
                 System.out.println("Not better: " + best);
             }
         }
+
+         */
         //pop.print();
         //Population pop = new Population();
         //pop.sortPop();
@@ -70,6 +74,7 @@ public class Main {
         System.out.println(s);
 
          */
+
 
     }
 }
