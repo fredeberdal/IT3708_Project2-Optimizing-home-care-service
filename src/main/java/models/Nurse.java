@@ -31,14 +31,14 @@ public class Nurse {
     public double getTime_traveled() { return time_traveled; }
 
     public void setTime_traveled(double time_traveled) {
-        this.time_traveled += time_traveled;
+        this.time_traveled = time_traveled;
     }
 
     public double getNurse_traveled() {
         return nurse_traveled;
     }
     public void setNurse_traveled(double nurse_traveled) {
-        this.nurse_traveled += nurse_traveled;
+        this.nurse_traveled = nurse_traveled;
     } //change?
 
     public List<Patient> getListOfPatients() {

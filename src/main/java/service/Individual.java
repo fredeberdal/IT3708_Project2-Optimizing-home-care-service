@@ -14,13 +14,17 @@ public class Individual {
     public List<Nurse> nurses;
     public double fitness;
 
-    public Individual() {
-        this.nurses = generateRandom(Settings.patients, Settings.number_of_nurses);
-        this.fitness = calculateFitness(nurses);
+    public Individual(){
+    }
+    public Individual makeIndividual(Individual ind) {
+        ind.nurses = generateGreedyInd(Settings.patients, Settings.number_of_nurses);
+        ind.fitness = calculateFitness(nurses);
+        return ind;
     }
 
     public double calculateFitness(List<Nurse> nurses){
         double fitness = 0;
+        double pen = 0;
         int penalty = 1000;
         double timeViolation = 0.0;
         double totalTravelTime = 0.0;
@@ -31,9 +35,10 @@ public class Individual {
             }
         }
         if(this.failed){
-            System.out.println("Fail");
+            pen = 2;
+            System.out.println("failed");
         }
-        fitness = totalTravelTime + (timeViolation * penalty);
+        fitness = totalTravelTime + (timeViolation * penalty) + (penalty*pen);
         return fitness;
     }
     public double calculateRoute(Nurse nurse){
@@ -194,7 +199,7 @@ public class Individual {
                     valid = checkValidity(nurses);
                 }
                 if (!valid) {
-                    System.out.println("Her feilet jeg ");
+                    //System.out.println("Her feilet jeg ");
                     n.removeListOfPatients(patient);
                     for (Nurse nurse : nursePos.keySet()) {
                         int pos = nursePos.get(nurse);
@@ -206,8 +211,8 @@ public class Individual {
                         }
                     }
                     this.failed = true;
+                    n.addListOfPatients(patient);
                 }
-                n.addListOfPatients(patient);
                 nursePos.put(n, patient.getId());
             }
         }
@@ -256,24 +261,27 @@ public class Individual {
                     }
                     totalTime+=p.getCareTime();
                     if(p.getEndWindow() < totalTime){
+                        //System.out.println("Failed at endwindow");
                         return false;
                     }
                     capacityUsed += p.getDemand();
                     if(capacityUsed > n.getCapacity()){
+                        System.out.println("Failed at capacity");
                         return false;
                     }
                     lastStop = p.getId();
                 }
                 //Back to depot
-                totalTime+= Settings.travelMatrix.get(0).get(lastStop);
+                totalTime += Settings.travelMatrix.get(0).get(lastStop);
                 totalTravelTime += Settings.travelMatrix.get(0).get(lastStop);
                 if(Settings.depot_return_time < totalTime){
+                    System.out.println("Failed at returntime");
                     return false;
                 }
             }
-            //n.setNurse_traveled(totalTime);
+            n.setNurse_traveled(totalTime);
             //n.setCapacity(capacityUsed);
-            //n.setTime_traveled(totalTravelTime);
+            n.setTime_traveled(totalTravelTime);
         }
         return true;
     }
@@ -314,6 +322,9 @@ public class Individual {
 
     public double computeTravelDistance(Nurse nurse, boolean back) {
         List<Patient> listOfPatients = nurse.getListOfPatients();
+        if(listOfPatients.isEmpty()){
+            return 0;
+        }
         Patient patient = listOfPatients.get(0);
         int nurseId = nurse.getId();
         double traveled;

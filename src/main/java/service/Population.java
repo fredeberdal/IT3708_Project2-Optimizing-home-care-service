@@ -20,6 +20,7 @@ public class Population {
         Population population = new Population();
         for(int i = 0; i<Settings.POP_SIZE; i++){
             Individual ind = new Individual();
+            ind.makeIndividual(ind);
             population.individuals.add(ind);
         }
         return population;
@@ -32,6 +33,8 @@ public class Population {
         Pair childrenPair;
         for(int i = 0; i<pop.individuals.size();i++){
             childrenPair = crossover(pop.parentsSelectionElite());
+            childrenPair.parent1.fitness = childrenPair.parent1.calculateFitness(childrenPair.parent1.nurses);
+            childrenPair.parent2.fitness = childrenPair.parent2.calculateFitness(childrenPair.parent2.nurses);
             children.individuals.add(childrenPair.parent1);
             children.individuals.add(childrenPair.parent2);
         }
@@ -51,7 +54,7 @@ public class Population {
     }
     public Pair parentsSelectionElite(){
         int random = (int)Math.floor(Math.random() * (10));
-        System.out.println(random);
+        //System.out.println(random);
         Individual p1 = this.individuals.get(random);
         Individual p2 = this.individuals.get(random);
         Pair pair = new Pair(p1, p2);
@@ -67,16 +70,20 @@ public class Population {
         Individual c1 = children.parent1;
         Individual c2 = children.parent2;
 
-        //Implement mutate
+        //Mutate
         c1 = mutate(c1);
         c2 = mutate(c2);
 
+        //Crowding if new children are valid
+        System.out.println(c1.checkValidity(c1.nurses));
         if(c1.checkValidity(c1.nurses) && c2.checkValidity(c2.nurses)){
             return crowding(c1, c2, p1, p2);
         }else{
             System.out.println("ikke lovlig");
         }
-        return null;
+        children.parent1 = c1;
+        children.parent2 = c2;
+        return children;
     }
     public Individual compareChrom(Individual ind1, Individual ind2){
         Individual best;
@@ -135,8 +142,16 @@ public class Population {
         Individual p2 = parents.parent2;
         Nurse nurseChild1 = findNurseRoute(p1, 1);
         Nurse nurseChild2 = findNurseRoute(p2, 1);
-        Individual child1 = removePatients(nurseChild1, p2);
-        Individual child2 = removePatients(nurseChild2, p1);
+        Individual child1 = null;
+        Individual child2 = null;
+        for(int i = 0; i<nurseChild1.getListOfPatients().size();i++){
+            child1 = removePatient(nurseChild1.getListOfPatients().get(i), p2);
+        }
+        for(int i = 0; i<nurseChild1.getListOfPatients().size();i++){
+            child2 = removePatient(nurseChild1.getListOfPatients().get(i), p1);
+        }
+        //Individual child1 = removePatients(nurseChild1, p2);
+        //Individual child2 = removePatients(nurseChild2, p1);
 
         child1 = insertRandom(child1, nurseChild2);
         child2 = insertRandom(child2, nurseChild1);
@@ -149,7 +164,7 @@ public class Population {
         List<Patient> patients = nurseChild.getListOfPatients();
         int random;
         while(!nurseChild.getListOfPatients().isEmpty()){
-            random = ThreadLocalRandom.current().nextInt();
+            random = ThreadLocalRandom.current().nextInt(0, Settings.number_of_nurses);
             child.nurses.get(random).addListOfPatients(nurseChild.getListOfPatients().get(0));
             nurseChild.removeListOfPatients(nurseChild.getListOfPatients().get(0));
         }
@@ -185,27 +200,44 @@ public class Population {
 
 
     public Individual removePatients(Nurse nurseChild2, Individual p1) {
+        Individual individualNew = p1;
         for(Nurse n : p1.nurses){
             for(Patient p : n.getListOfPatients()){
                 for(Patient pChild : nurseChild2.getListOfPatients()){
                     if(pChild.getId() == p.getId()){
-                        n.removeListOfPatients(p);
+                        individualNew.nurses.get(n.getId()).removeListOfPatients(p);
                     }
                 }
             }
         }
-        return p1;
+        return individualNew;
+    }
+    public Individual removePatient(Patient patient, Individual p1) {
+        Individual individualNew = p1;
+        for(Nurse n : p1.nurses){
+            for(Patient p : n.getListOfPatients()){
+                if(patient == p){
+                    individualNew.nurses.get(n.getId()).removeListOfPatients(p);
+                    return individualNew;
+                }
+            }
+        }
+
+        return individualNew;
     }
 
     public Nurse findNurseRoute(Individual ind, int amountOfPatients){
-        List<Nurse> nursesWithPatients = null;
+        List<Nurse> nursesWithPatients = new ArrayList<>();
         for(Nurse n : ind.nurses){
-            if(n.getListOfPatients().size() > 0){
+            if(n.getListOfPatients().size() > amountOfPatients-1){
                 nursesWithPatients.add(n);
             }
         }
-        int random = ThreadLocalRandom.current().nextInt(0, nursesWithPatients.size());
-        Nurse n = nursesWithPatients.get(random);
+        Nurse n = ind.nurses.get(0);
+        if(nursesWithPatients != null){
+            int random = ThreadLocalRandom.current().nextInt(0, nursesWithPatients.size());
+            n = nursesWithPatients.get(random);
+        }
         return n;
     }
 
