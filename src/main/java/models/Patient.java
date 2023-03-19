@@ -9,6 +9,7 @@ public class Patient {
     private final int demand;
     private final int xCordinate;
     private final int yCordinate;
+    private int priority;
 
     public Patient(int id, int startWindow, int endWindow, int careTime, int demand, int xCordinate, int yCordinate){
         this.id = id;
@@ -18,6 +19,14 @@ public class Patient {
         this.demand = demand;
         this.xCordinate = xCordinate;
         this.yCordinate = yCordinate;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 
     public int getStartWindow() {
