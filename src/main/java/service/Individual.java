@@ -22,6 +22,11 @@ public class Individual {
         return ind;
     }
 
+    public Individual(Individual ind){
+        this.nurses = ind.nurses;
+        this.fitness = ind.fitness;
+    }
+
     public double calculateFitness(List<Nurse> nurses){
         double fitness = 0;
         double pen = 0;
@@ -52,21 +57,7 @@ public class Individual {
         }
         return totalTravelTime;
     }
-    /*
-    public void generatePopulation(List<Patient> patientList) {
-        Individual pg = new Individual(patientList, Settings.number_of_nurses);
-        HashMap<List<Nurse>, Double> tup = new HashMap<List<Nurse>, Double>();
-        Fitness fitness = new Fitness();
-        for (int i = 0; i < Settings.POP_SIZE; i++) {
-            List<Nurse> list = pg.generateGreedyInd(patientList, Settings.number_of_nurses);
-            tup.put(list, fitness.calculateFitness(list));
-            list = null;
-        }
-        sortIndividuals(tup);
 
-    }
-
-     */
 
     public void sortIndividuals(HashMap<List<Nurse>, Double> individuals) {
         ArrayList<Double> list = new ArrayList<>();
@@ -287,7 +278,7 @@ public class Individual {
     }
 
     public List<Patient> patientsFlat(){
-        List<Patient> patientsFlat = null;
+        List<Patient> patientsFlat = new ArrayList<>();
         for(Nurse n : this.nurses){
             for(Patient p : n.getListOfPatients()){
                 patientsFlat.add(p);

@@ -75,15 +75,23 @@ public class Population {
         c2 = mutate(c2);
 
         //Crowding if new children are valid
-        System.out.println(c1.checkValidity(c1.nurses));
+        //System.out.println(c1.checkValidity(c1.nurses));
+        if(c1 != null && c2 != null && p1 != null && p2 != null){
+            return crowding(c1,c2,p1,p2);
+        }else{
+            return parents;
+        }
+        /*
         if(c1.checkValidity(c1.nurses) && c2.checkValidity(c2.nurses)){
             return crowding(c1, c2, p1, p2);
         }else{
             System.out.println("ikke lovlig");
         }
-        children.parent1 = c1;
-        children.parent2 = c2;
-        return children;
+
+         */
+        //children.parent1 = c1;
+        //children.parent2 = c2;
+        //return children;
     }
     public Individual compareChrom(Individual ind1, Individual ind2){
         Individual best;
@@ -142,14 +150,9 @@ public class Population {
         Individual p2 = parents.parent2;
         Nurse nurseChild1 = findNurseRoute(p1, 1);
         Nurse nurseChild2 = findNurseRoute(p2, 1);
-        Individual child1 = null;
-        Individual child2 = null;
-        for(int i = 0; i<nurseChild1.getListOfPatients().size();i++){
-            child1 = removePatient(nurseChild1.getListOfPatients().get(i), p2);
-        }
-        for(int i = 0; i<nurseChild1.getListOfPatients().size();i++){
-            child2 = removePatient(nurseChild1.getListOfPatients().get(i), p1);
-        }
+        Individual child1 = removePatients(nurseChild1, p2);
+        Individual child2 = removePatients(nurseChild2, p1);
+
         //Individual child1 = removePatients(nurseChild1, p2);
         //Individual child2 = removePatients(nurseChild2, p1);
 
@@ -197,23 +200,15 @@ public class Population {
          */
     }
 
-
-
     public Individual removePatients(Nurse nurseChild2, Individual p1) {
-        Individual individualNew = p1;
-        for(Nurse n : p1.nurses){
-            for(Patient p : n.getListOfPatients()){
-                for(Patient pChild : nurseChild2.getListOfPatients()){
-                    if(pChild.getId() == p.getId()){
-                        individualNew.nurses.get(n.getId()).removeListOfPatients(p);
-                    }
-                }
-            }
+        Individual individualNew = new Individual(p1);
+        for(Patient p : nurseChild2.getListOfPatients()){
+            individualNew = removePatient(p, p1);
         }
         return individualNew;
     }
     public Individual removePatient(Patient patient, Individual p1) {
-        Individual individualNew = p1;
+        Individual individualNew = new Individual(p1);
         for(Nurse n : p1.nurses){
             for(Patient p : n.getListOfPatients()){
                 if(patient == p){

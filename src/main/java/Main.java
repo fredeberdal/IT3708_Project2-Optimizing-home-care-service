@@ -34,7 +34,7 @@ public class Main {
         pop.print();
         double best = 10000;
 
-        /*
+
         for(int i = 0; i<10000; i++){
             pop = pop.generateNewGen(pop);
             if(pop.individuals.get(0).fitness < best){
@@ -45,7 +45,7 @@ public class Main {
             }
         }
 
-         */
+
         //pop.print();
         //Population pop = new Population();
         //pop.sortPop();
