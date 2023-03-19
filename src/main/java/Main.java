@@ -1,4 +1,5 @@
 import models.Depot;
+import models.Nurse;
 import models.Patient;
 import models.Settings;
 import org.json.simple.JSONObject;
@@ -6,6 +7,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import service.Fitness;
 import service.Individual;
+import service.Population;
 import utils.VRPFileReader;
 
 import java.io.FileReader;
@@ -27,27 +29,47 @@ public class Main {
 
         Fitness fitness = new Fitness();
         Depot depot = new Depot();
-        Individual ind = new Individual();
+        Population pop = new Population();
+        double best = 10000;
+        for(int i = 0; i<10000; i++){
+            pop = pop.makePopulation();
+            pop.sortPop();
+            if(pop.individuals.get(0).fitness < best){
+                best = pop.individuals.get(0).fitness;
+                System.out.println("Bedre: " + best);
+            }else{
+                System.out.println("Not better: " + best);
+            }
+        }
+        //pop.print();
+        //Population pop = new Population();
+        //pop.sortPop();
+        //Population newPop = pop.generateNewGen(pop);
         //Individual pop = new Individual();
 
 
         //HashMap<List<Nurse>, Double> fit_pop= (patientList);
         //pop.generatePopulation(patientList);
-        //Settings.individuals.forEach((k, v) -> System.out.println("Fitness : " + v));
         //Settings.individuals.forEach((k,v) -> k.get(0).getListOfPatients());
         //Optional<List<Nurse>> nurses = Settings.individuals.keySet().stream().findFirst();
         //List<Nurse> nurse = nurses.get();
+
         /*
         String s = "[";
-        for(Nurse n : nurse){
-            s += "[";
-            for(Patient patients : n.getListOfPatients()){
-                s += "" + patients.getId() +", ";
+        for(Individual n : pop.individuals){
+            for(Nurse nurse : n.nurses){
+                s += "[";
+                for(Patient p : nurse.getListOfPatients()) {
+                    s += "" + p.getId() + ", ";
+                }
+                s += "], ";
+
             }
-            s += "], ";
         }
         s+= "]";
         System.out.println(s);
+
          */
+
     }
 }

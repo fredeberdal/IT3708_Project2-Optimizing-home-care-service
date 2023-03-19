@@ -15,23 +15,23 @@ public class Individual {
     public double fitness;
 
     public Individual() {
-        this.nurses = generateGreedyInd(Settings.patients, Settings.number_of_nurses);
+        this.nurses = generateRandom(Settings.patients, Settings.number_of_nurses);
         this.fitness = calculateFitness(nurses);
     }
+
     public double calculateFitness(List<Nurse> nurses){
         double fitness = 0;
         int penalty = 1000;
         double timeViolation = 0.0;
         double totalTravelTime = 0.0;
         for(Nurse nurse : nurses){
-            System.out.println(nurse.getListOfPatients().size());
-            totalTravelTime += calculateRoute(nurse);
+            totalTravelTime += nurse.getTime_traveled();
             if(nurse.getNurse_traveled() > Settings.depot_return_time){
                 timeViolation += nurse.getNurse_traveled() - Settings.depot_return_time;
             }
         }
         if(this.failed){
-            System.out.println("Suck dick penis");
+            System.out.println("Fail");
         }
         fitness = totalTravelTime + (timeViolation * penalty);
         return fitness;
@@ -43,7 +43,6 @@ public class Individual {
         for(int i = 0; i<nurse.getListOfPatients().size(); i++){
             if(i == nurse.getListOfPatients().size()-1){
                 totalTravelTime += Settings.travelMatrix.get(0).get(nurse.getListOfPatients().get(i).getId());
-
             }
         }
         return totalTravelTime;
@@ -82,12 +81,14 @@ public class Individual {
 
 
     public boolean checkValidity(Nurse nurse, Patient patient, int counter) {
-
         if (nurse.getListOfPatients().size() == 1) {
+            if(patient.getStartWindow()>0){
+                nurse.setNurse_traveled(patient.getStartWindow());
+                return true;
+            }
             return true;
         }
-
-        if (counter > 50 && nurse.getCapacity() > patient.getDemand() && nurse.getNurse_traveled() < patient.getStartWindow()) {
+        if (counter > 50 && nurse.getCapacity() > patient.getDemand() && nurse.getNurse_traveled() < patient.getStartWindow()) { //wait to first window if needed
             nurse.setNurse_traveled(patient.getStartWindow() - nurse.getNurse_traveled());
         }
         if (nurse.getNurse_traveled() <= patient.getEndWindow() - patient.getCareTime() && nurse.getNurse_traveled() >= patient.getStartWindow()) {
@@ -128,9 +129,11 @@ public class Individual {
                 }
             }
             if (isValid) {
+                d++;
+                //System.out.println(d);
                 nurse.setNurse_traveled(computeTravelDistance(nurse, false) + patient.getCareTime());
                 nurse.setTime_traveled(computeTravelDistance(nurse, false));
-                nurse.setCapacity(patient.getDemand());
+                nurse.setCapacity(nurse.getCapacity() - patient.getDemand());
                 copyOfPatients.remove(patient);
             }
         }
@@ -159,14 +162,33 @@ public class Individual {
                 n.addListOfPatients(patient);
             } else {
                 List<Nurse> nursesChecked = new ArrayList<>();
-                n = findClosestNurse(patient, nurses, nursePos, nursesChecked, true);
+                double distance = 10000;
+                int closestNurse = 0;
+                for (Nurse nurse : nursePos.keySet()) {
+                    int pos = nursePos.get(nurse);
+                    double travelTime = Settings.travelMatrix.get(pos).get(patient.getId());
+                    if (travelTime < distance) {
+                        distance = travelTime;
+                        closestNurse = nurse.getId();
+                        n = nurses.get(closestNurse);
+                    }
+                }
                 n.addListOfPatients(patient);
                 nursesChecked.add(n);
                 boolean valid = checkValidity(nurses);
                 while (amountOfNurses > nursesChecked.size() && !valid) {
                     n.removeListOfPatients(patient);
-                    n = null;
-                    n = findClosestNurse(patient, nurses, nursePos, nursesChecked, false);
+                    distance = 10000;
+                    closestNurse = 0;
+                    for (Nurse nurse : nursePos.keySet()) {
+                        int pos = nursePos.get(nurse);
+                        double travelTime = Settings.travelMatrix.get(pos).get(patient.getId());
+                        if (travelTime < distance && !(nursesChecked.contains(nurse))) {
+                                distance = travelTime;
+                                closestNurse = nurse.getId();
+                                n = nurses.get(closestNurse);
+                            }
+                        }
                     n.addListOfPatients(patient);
                     nursesChecked.add(n);
                     valid = checkValidity(nurses);
@@ -174,8 +196,15 @@ public class Individual {
                 if (!valid) {
                     System.out.println("Her feilet jeg ");
                     n.removeListOfPatients(patient);
-                    n = null;
-                    n = findClosestNurse(patient, nurses, nursePos, nursesChecked, false);
+                    for (Nurse nurse : nursePos.keySet()) {
+                        int pos = nursePos.get(nurse);
+                        double travelTime = Settings.travelMatrix.get(pos).get(patient.getId());
+                        if (travelTime < distance) {
+                            distance = travelTime;
+                            closestNurse = nurse.getId();
+                            n = nurses.get(closestNurse);
+                        }
+                    }
                     this.failed = true;
                 }
                 n.addListOfPatients(patient);
@@ -242,13 +271,22 @@ public class Individual {
                     return false;
                 }
             }
-            n.setNurse_traveled(totalTime);
+            //n.setNurse_traveled(totalTime);
             //n.setCapacity(capacityUsed);
-            n.setTime_traveled(totalTravelTime);
+            //n.setTime_traveled(totalTravelTime);
         }
         return true;
     }
 
+    public List<Patient> patientsFlat(){
+        List<Patient> patientsFlat = null;
+        for(Nurse n : this.nurses){
+            for(Patient p : n.getListOfPatients()){
+                patientsFlat.add(p);
+            }
+        }
+        return patientsFlat;
+    }
 
 
     public Patient getLowestPatient(List<Patient>patients){
@@ -279,7 +317,6 @@ public class Individual {
         Patient patient = listOfPatients.get(0);
         int nurseId = nurse.getId();
         double traveled;
-
         if(back){
             int fromPatient = 0;
             if(listOfPatients.size()==1){
@@ -301,5 +338,6 @@ public class Individual {
         }
         return traveled;
     }
+
 
 }

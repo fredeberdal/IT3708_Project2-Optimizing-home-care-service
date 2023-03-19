@@ -31,21 +31,24 @@ public class Nurse {
     public double getTime_traveled() { return time_traveled; }
 
     public void setTime_traveled(double time_traveled) {
-        this.time_traveled = time_traveled;
+        this.time_traveled += time_traveled;
     }
 
     public double getNurse_traveled() {
         return nurse_traveled;
     }
     public void setNurse_traveled(double nurse_traveled) {
-        this.nurse_traveled = nurse_traveled;
-    }
+        this.nurse_traveled += nurse_traveled;
+    } //change?
 
     public List<Patient> getListOfPatients() {
         return listOfPatients;
     }
     public void addListOfPatients(Patient patient) {
         this.listOfPatients.add(patient);
+    }
+    public void replacePatient(Patient patient,int index) {
+        this.listOfPatients.set(index, patient);
     }
     public void removeListOfPatients(Patient patient) {
         this.listOfPatients.remove(patient);
