@@ -8,10 +8,12 @@ import java.util.List;
 public class Settings {
 
     public static int TASK_NUMBER = 0;
-    public static int POP_SIZE = 1;
+    public static int POP_SIZE = 10000;
     public static int nurse_capacity;
     public static int number_of_nurses;
     public static int depot_return_time;
+
+    public static double mutationProb = 0.2;
     public static double max_travel_time = 0;
     public static List<Patient> patients = new ArrayList<>();
 
